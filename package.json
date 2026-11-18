@@ -2,6 +2,18 @@
   "name": "react-modular-di",
   "version": "0.1.0",
   "description": "Declarative tsyringe modules and React dependency injection bindings.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RomanSkrypnik/react-modular-di.git"
+  },
+  "homepage": "https://github.com/RomanSkrypnik/react-modular-di#readme",
+  "bugs": {
+    "url": "https://github.com/RomanSkrypnik/react-modular-di/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -44,11 +56,12 @@
     "typecheck": "tsc -p tsconfig.test.json --noEmit",
     "test": "tsc -p tsconfig.test.json && node --test .test-dist/tests/*.test.js",
     "test:package": "npm test && node scripts/verify-package.mjs",
+    "test:next": "node scripts/verify-next.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm test && npm run build && npm run format:check",
     "prepack": "npm run build",
-    "prepublishOnly": "npm run check && npm run test:package"
+    "prepublishOnly": "npm run check && npm run test:package && npm run test:next"
   },
   "dependencies": {
     "reflect-metadata": "0.2.2"
@@ -63,6 +76,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "jsdom": "26.1.0",
+    "playwright": "1.65.1",
     "prettier": "3.10.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",

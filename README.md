@@ -10,18 +10,33 @@ Declarative modules on top of [tsyringe](https://github.com/microsoft/tsyringe),
 
 ## Status and compatibility
 
-This is the initial `0.1.0` source project, extracted from an existing application.
-It has not been published to npm yet.
+Version `0.1.0` provides a small module composition layer and React bindings,
+extracted from an existing application.
 
 - **ES modules only**, with precompiled JavaScript and TypeScript declarations.
-- Node.js **22+** for development and the package verification scripts.
+- Node.js **22+**, as declared by the package's supported engine range.
 - Peer dependencies: **tsyringe 4.10.0**, **React 18.3.1 or React 19**.
 - The installed tarball is tested against React **18.3.1** and **19.2.0**.
 - Legacy TypeScript decorators and constructor metadata are required for implicit constructor injection.
-- Next.js and Vite application builds have not yet been verified for the extracted package.
+- Next.js **16.4.6 / Turbopack** with React **19.2.0**: installed-tarball production build,
+  Client Component prerendering, Chromium hydration and singleton identity are verified.
+- Vite production builds have not been verified.
 - Server Components and request-scoped server DI are not part of the initial supported contract.
 
-## Local installation
+## Installation
+
+```sh
+npm install react-modular-di tsyringe@4.10.0
+```
+
+React **18.3.1** or **19** must already be installed in the consuming application.
+The package provides ES modules and TypeScript declarations; it does not provide
+a CommonJS entrypoint.
+
+The library loads `reflect-metadata` before re-exporting the tsyringe decorators.
+Import decorators from `react-modular-di` to preserve this initialization order.
+
+### Install from a local checkout
 
 Build a tarball in this project:
 
@@ -36,10 +51,6 @@ Install it in a consuming project, together with the matching peer dependencies:
 ```sh
 npm install /absolute/path/react-modular-di-0.1.0.tgz tsyringe@4.10.0
 ```
-
-React must already be installed in the consuming application. The library loads
-`reflect-metadata` before re-exporting the tsyringe decorators. Import decorators
-from `react-modular-di` to preserve this initialization order.
 
 ## Compiler setup
 
@@ -64,6 +75,21 @@ For Babel, tsyringe documents `babel-plugin-transform-typescript-metadata` along
 legacy decorator support. Vite's support depends on the transformer and version.
 Verify a real constructor dependency in your production build before using a new
 toolchain. A missing transform typically produces `TypeInfo not known` during resolution.
+
+### Next.js App Router
+
+Use `react-modular-di/react` from a Client Component. Create the container inside
+that client boundary, enable both decorator options in `tsconfig.json`, and keep
+module/service imports in the same client graph. The tested Turbopack setup does
+not require `transpilePackages` or a custom Babel configuration.
+
+Client Components can be prerendered on the server: constructors must be safe to
+run there. Browser-specific work belongs in an explicitly managed client lifecycle.
+Do not pass a container instance from a Server Component to a Client Component:
+containers are not serializable props. Server Component resolution and shared
+server/request containers are outside this package's initial lifecycle contract.
+
+The reproducible example is in [`tests/fixtures/next`](https://github.com/RomanSkrypnik/react-modular-di/tree/main/tests/fixtures/next).
 
 ## Quick start
 
@@ -245,6 +271,8 @@ Resolution errors propagate unchanged; the library does not log them automatical
 npm ci
 npm run check
 npm run test:package
+npx playwright install chromium
+npm run test:next
 ```
 
 `check` type-checks production and test sources, runs Node's test runner, emits JS
@@ -256,5 +284,14 @@ with React 18 and 19, checks public declarations against matching React types,
 and reruns all runtime tests through the installed public exports. Artifacts are
 kept in the gitignored `.package-test/` directory for inspection.
 
-Before a public release, verify actual Next.js/Vite production builds for the
-toolchains you intend to support, choose a repository URL, and review package metadata.
+`test:next` packs and installs the library into a clean Next.js fixture, builds it
+with Turbopack, serves the production output, checks prerendered dependency resolution,
+and verifies hydration, a client interaction, singleton identity and browser errors
+using Playwright Chromium. The fixture and tarball are kept in `.package-test/`;
+the server and browser are closed when verification finishes. Next.js and Playwright
+are test tooling, not runtime dependencies of the published library.
+
+## Release
+
+The release process is documented in [RELEASING.md](https://github.com/RomanSkrypnik/react-modular-di/blob/main/RELEASING.md).
+`npm publish` automatically runs all checks above through `prepublishOnly`.

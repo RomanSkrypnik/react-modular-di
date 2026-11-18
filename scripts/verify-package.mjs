@@ -10,8 +10,9 @@ mkdirSync(artifacts, { recursive: true });
 const runDirectory = mkdtempSync(join(artifacts, "run-"));
 const npm = process.platform === "win32" ? "npm.cmd" : "npm";
 
+// A publication dry run still needs real local tarballs and fixture installations.
 const packed = JSON.parse(
-  execFileSync(npm, ["pack", "--json", "--pack-destination", runDirectory], {
+  execFileSync(npm, ["pack", "--dry-run=false", "--json", "--pack-destination", runDirectory], {
     cwd: project,
     encoding: "utf8",
   }),
@@ -64,7 +65,7 @@ for (const version of matrix) {
       2,
     ),
   );
-  execFileSync(npm, ["install", "--ignore-scripts", "--no-audit", "--no-fund"], {
+  execFileSync(npm, ["install", "--dry-run=false", "--ignore-scripts", "--no-audit", "--no-fund"], {
     cwd,
     stdio: "inherit",
   });
