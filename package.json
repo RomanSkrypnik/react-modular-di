@@ -1,0 +1,72 @@
+{
+  "name": "react-modular-di",
+  "version": "0.1.0",
+  "description": "Declarative tsyringe modules and React dependency injection bindings.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./dist/tsyringe.js"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "author": {
+    "email": "rorchenko@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "react",
+    "dependency-injection",
+    "di",
+    "tsyringe",
+    "modules",
+    "typescript"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
+    "test": "tsc -p tsconfig.test.json && node --test .test-dist/tests/*.test.js",
+    "test:package": "npm test && node scripts/verify-package.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run typecheck && npm test && npm run build && npm run format:check",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run check && npm run test:package"
+  },
+  "dependencies": {
+    "reflect-metadata": "0.2.2"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1 || ^19.0.0",
+    "tsyringe": "4.10.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "21.1.7",
+    "@types/node": "22.20.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "jsdom": "26.1.0",
+    "prettier": "3.10.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "tsyringe": "4.10.0",
+    "typescript": "5.9.3"
+  }
+}

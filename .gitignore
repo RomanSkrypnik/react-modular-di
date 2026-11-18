@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.test-dist/
+.package-test/
+*.tgz
+*.tsbuildinfo
+.DS_Store
